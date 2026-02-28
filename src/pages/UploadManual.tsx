@@ -191,7 +191,7 @@ export default function UploadManual() {
       </div>
 
       {/* Save button */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-card border-t border-border safe-bottom">
+      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] p-4 bg-card border-t border-border safe-bottom">
         <button
           onClick={handleSave}
           className="w-full py-3 rounded-xl bg-primary text-primary-foreground text-sm font-semibold active:scale-[0.98] transition-transform"

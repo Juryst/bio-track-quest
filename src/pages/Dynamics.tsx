@@ -2,8 +2,12 @@ import { useState, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Search, ChevronDown, AlertTriangle } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, Tooltip, ReferenceArea, ReferenceLine, ResponsiveContainer, Dot } from 'recharts';
+import {
+  LineChart, Line, XAxis, YAxis, Tooltip, ReferenceArea, ReferenceLine,
+  ResponsiveContainer,
+} from 'recharts';
 import { useAnalysisStore } from '@/store/useAnalysisStore';
+import { useProfilesStore } from '@/store/useProfilesStore';
 import { StatusBadge } from '@/components/StatusBadge';
 import { MarkerStatus } from '@/types';
 
@@ -25,24 +29,32 @@ const statusColor: Record<MarkerStatus, string> = {
 
 function CustomDot(props: any) {
   const { cx, cy, payload } = props;
-  return <circle cx={cx} cy={cy} r={5} fill={statusColor[payload.status as MarkerStatus] || '#999'} stroke="white" strokeWidth={2} />;
+  return (
+    <circle
+      cx={cx} cy={cy} r={5}
+      fill={statusColor[payload.status as MarkerStatus] || '#999'}
+      stroke="white" strokeWidth={2}
+    />
+  );
 }
 
 function CustomTooltip({ active, payload }: any) {
   if (!active || !payload?.[0]) return null;
   const d = payload[0].payload;
   return (
-    <div className="bg-card border border-border rounded-lg p-2 shadow-lg text-xs">
+    <div className="bg-card border border-border rounded-lg p-2.5 shadow-lg text-xs">
       <p className="font-medium text-foreground">{formatDateFull(d.date)}</p>
       <p className="font-mono font-semibold mt-1">{d.value} {d.unit}</p>
-      <StatusBadge status={d.status} />
+      <div className="mt-1"><StatusBadge status={d.status} /></div>
     </div>
   );
 }
 
 export default function Dynamics() {
   const { canonicalName: paramCanonical } = useParams<{ canonicalName: string }>();
-  const analyses = useAnalysisStore((s) => s.analyses);
+  const activeProfileId = useProfilesStore((s) => s.activeProfileId);
+  const getAnalysesForProfile = useAnalysisStore((s) => s.getAnalysesForProfile);
+  const analyses = useMemo(() => getAnalysesForProfile(activeProfileId), [getAnalysesForProfile, activeProfileId]);
   const [search, setSearch] = useState('');
   const [selectorOpen, setSelectorOpen] = useState(false);
 
@@ -60,7 +72,6 @@ export default function Dynamics() {
   }, [analyses]);
 
   const [selectedCanonical, setSelectedCanonical] = useState(paramCanonical || allMarkers[0]?.canonicalName || '');
-
   const selectedInfo = allMarkers.find((m) => m.canonicalName === selectedCanonical);
 
   // Build history
@@ -87,6 +98,49 @@ export default function Dynamics() {
   const refLow = history[0]?.refLow;
   const refHigh = history[0]?.refHigh;
   const unit = history[0]?.unit || '';
+
+  // Smart Y-axis domain
+  const { yMin, yMax } = useMemo(() => {
+    if (history.length === 0) return { yMin: 0, yMax: 100 };
+    const values = history.map((d: any) => d.value);
+    const allPoints = [
+      ...values,
+      ...(refLow != null ? [refLow] : []),
+      ...(refHigh != null ? [refHigh] : []),
+    ];
+    const dataMin = Math.min(...allPoints);
+    const dataMax = Math.max(...allPoints);
+    const padding = Math.max((dataMax - dataMin) * 0.2, 1);
+    return { yMin: Math.floor(dataMin - padding), yMax: Math.ceil(dataMax + padding) };
+  }, [history, refLow, refHigh]);
+
+  // Trend summary
+  const trendSummary = useMemo(() => {
+    if (history.length < 2) return null;
+    const first = history[0];
+    const last = history[history.length - 1];
+    const delta = last.value - first.value;
+
+    const statusSeverity: Record<string, number> = { normal: 0, borderline: 1, low: 2, high: 2, unknown: 0 };
+    const firstSev = statusSeverity[first.status] || 0;
+    const lastSev = statusSeverity[last.status] || 0;
+
+    let trend: 'worsening' | 'improving' | 'stable';
+    if (lastSev > firstSev) trend = 'worsening';
+    else if (lastSev < firstSev) trend = 'improving';
+    else if (Math.abs(delta) < 0.5) trend = 'stable';
+    else {
+      if (refLow != null && last.value < refLow) trend = delta < 0 ? 'worsening' : 'improving';
+      else if (refHigh != null && last.value > refHigh) trend = delta > 0 ? 'worsening' : 'improving';
+      else trend = 'stable';
+    }
+
+    const arrow = trend === 'worsening' ? '↓' : trend === 'improving' ? '↑' : '→';
+    const color = trend === 'worsening' ? 'text-status-danger' : trend === 'improving' ? 'text-status-normal' : 'text-muted-foreground';
+    const sign = delta > 0 ? '+' : '';
+
+    return { arrow, color, sign, delta, firstDate: first.date, lastDate: last.date };
+  }, [history, refLow, refHigh]);
 
   const filteredMarkers = allMarkers.filter((m) =>
     m.name.toLowerCase().includes(search.toLowerCase())
@@ -153,6 +207,19 @@ export default function Dynamics() {
         )}
       </div>
 
+      {/* Trend Summary */}
+      {trendSummary && (
+        <div className="mx-5 mb-3 flex items-center gap-2 px-3.5 py-2.5 rounded-[10px] bg-secondary">
+          <span className={`text-base font-bold ${trendSummary.color}`}>{trendSummary.arrow}</span>
+          <span className={`text-sm font-semibold ${trendSummary.color}`}>
+            {trendSummary.sign}{trendSummary.delta.toFixed(1)} {unit}
+          </span>
+          <span className="text-xs text-muted-foreground">
+            {formatDateShort(trendSummary.firstDate)} — {formatDateShort(trendSummary.lastDate)}
+          </span>
+        </div>
+      )}
+
       {/* Chart */}
       {history.length < 2 ? (
         <div className="mx-5 p-6 rounded-xl bg-card border border-border text-center">
@@ -166,12 +233,12 @@ export default function Dynamics() {
           <ResponsiveContainer width="100%" height={200}>
             <LineChart data={history} margin={{ top: 10, right: 10, bottom: 0, left: -20 }}>
               {refLow != null && refHigh != null && (
-                <ReferenceArea y1={refLow} y2={refHigh} fill="hsl(142, 71%, 35%)" fillOpacity={0.08} />
+                <ReferenceArea y1={refLow} y2={refHigh} fill="hsl(142, 71%, 45%)" fillOpacity={0.08} />
               )}
-              {refLow != null && <ReferenceLine y={refLow} stroke="hsl(142, 71%, 35%)" strokeDasharray="4 4" strokeOpacity={0.5} />}
-              {refHigh != null && <ReferenceLine y={refHigh} stroke="hsl(142, 71%, 35%)" strokeDasharray="4 4" strokeOpacity={0.5} />}
-              <XAxis dataKey="date" tickFormatter={formatDateShort} tick={{ fontSize: 10 }} stroke="hsl(220, 9%, 60%)" />
-              <YAxis tick={{ fontSize: 10 }} stroke="hsl(220, 9%, 60%)" />
+              {refLow != null && <ReferenceLine y={refLow} stroke="hsl(220, 9%, 70%)" strokeDasharray="4 4" />}
+              {refHigh != null && <ReferenceLine y={refHigh} stroke="hsl(220, 9%, 70%)" strokeDasharray="4 4" />}
+              <XAxis dataKey="date" tickFormatter={formatDateShort} tick={{ fontSize: 10 }} stroke="hsl(220, 9%, 70%)" />
+              <YAxis domain={[yMin, yMax]} tick={{ fontSize: 10 }} stroke="hsl(220, 9%, 70%)" />
               <Tooltip content={<CustomTooltip />} />
               <Line type="monotone" dataKey="value" stroke="hsl(217, 91%, 53%)" strokeWidth={2} dot={<CustomDot />} />
             </LineChart>
@@ -186,7 +253,7 @@ export default function Dynamics() {
             История значений
           </p>
           {history.slice().reverse().map((point, i) => (
-            <div key={i} className="flex items-center justify-between px-4 py-3 border-b border-border last:border-b-0">
+            <div key={i} className="flex items-center justify-between px-4 py-3 border-b border-[rgba(0,0,0,0.05)] dark:border-[rgba(255,255,255,0.05)] last:border-b-0">
               <div>
                 <p className="text-sm text-foreground">{formatDateFull(point.date)}</p>
                 <p className="text-xs text-muted-foreground">{point.lab}</p>

@@ -1,6 +1,7 @@
 export type MarkerStatus = 'normal' | 'low' | 'high' | 'borderline' | 'unknown';
 export type AnalysisStatus = 'normal' | 'borderline' | 'abnormal';
 export type Sex = 'male' | 'female';
+export type ProfileRelation = 'self' | 'spouse' | 'child' | 'parent' | 'other';
 
 export interface ReferenceRange {
   low: number;
@@ -20,6 +21,7 @@ export interface Marker {
 
 export interface Analysis {
   id: string;
+  profileId?: string;
   type: string;
   lab: string;
   date: string;
@@ -33,6 +35,18 @@ export interface Profile {
   sex?: Sex;
   conditions: string[];
   medications: string[];
+}
+
+export interface FamilyProfile {
+  id: string;
+  name: string;
+  relation: ProfileRelation;
+  dob?: string;
+  sex?: Sex;
+  conditions: string[];
+  medications: string[];
+  supplements: string[];
+  isDefault: boolean;
 }
 
 export interface AiReview {

@@ -4,7 +4,6 @@
 
 @layer base {
   :root {
-    /* Telegram theme integration with fallbacks */
     --tg-bg: var(--tg-theme-bg-color, #FFFFFF);
     --tg-text: var(--tg-theme-text-color, #000000);
     --tg-hint: var(--tg-theme-hint-color, #999999);
@@ -13,31 +12,22 @@
     --tg-button-text: var(--tg-theme-button-text-color, #FFFFFF);
     --tg-secondary-bg: var(--tg-theme-secondary-bg-color, #F5F5F5);
 
-    /* Design system — HSL */
     --background: 0 0% 100%;
     --foreground: 220 15% 10%;
-
     --card: 0 0% 100%;
     --card-foreground: 220 15% 10%;
-
     --popover: 0 0% 100%;
     --popover-foreground: 220 15% 10%;
-
     --primary: 217 91% 53%;
     --primary-foreground: 0 0% 100%;
-
     --secondary: 220 14% 96%;
     --secondary-foreground: 220 15% 10%;
-
     --muted: 220 14% 96%;
     --muted-foreground: 220 9% 46%;
-
     --accent: 220 14% 96%;
     --accent-foreground: 220 15% 10%;
-
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
-
     --border: 220 13% 91%;
     --input: 220 13% 91%;
     --ring: 217 91% 53%;
@@ -45,15 +35,18 @@
 
     /* Medical status colors */
     --status-normal: 142 71% 35%;
-    --status-normal-bg: 138 76% 97%;
+    --status-normal-bg: 138 76% 93%;
+    --status-normal-text: 142 61% 24%;
     --status-warning: 37 91% 55%;
-    --status-warning-bg: 48 96% 96%;
+    --status-warning-bg: 48 96% 90%;
+    --status-warning-text: 33 83% 31%;
     --status-danger: 0 72% 51%;
-    --status-danger-bg: 0 86% 97%;
+    --status-danger-bg: 0 86% 94%;
+    --status-danger-text: 0 69% 35%;
     --status-unknown: 220 9% 60%;
     --status-unknown-bg: 220 14% 96%;
+    --status-unknown-text: 215 16% 47%;
 
-    /* Chart */
     --chart-reference: 142 71% 35%;
 
     --sidebar-background: 0 0% 98%;
@@ -69,36 +62,32 @@
   .dark {
     --background: 222 47% 6%;
     --foreground: 210 40% 96%;
-
     --card: 222 47% 9%;
     --card-foreground: 210 40% 96%;
-
     --popover: 222 47% 9%;
     --popover-foreground: 210 40% 96%;
-
     --primary: 217 91% 60%;
     --primary-foreground: 0 0% 100%;
-
     --secondary: 217 33% 17%;
     --secondary-foreground: 210 40% 96%;
-
     --muted: 217 33% 17%;
     --muted-foreground: 215 20% 65%;
-
     --accent: 217 33% 17%;
     --accent-foreground: 210 40% 96%;
-
     --destructive: 0 63% 31%;
     --destructive-foreground: 210 40% 96%;
-
     --border: 217 33% 17%;
     --input: 217 33% 17%;
     --ring: 213 27% 84%;
 
     --status-normal-bg: 142 40% 12%;
+    --status-normal-text: 142 71% 60%;
     --status-warning-bg: 37 50% 12%;
+    --status-warning-text: 37 91% 65%;
     --status-danger-bg: 0 50% 12%;
+    --status-danger-text: 0 72% 65%;
     --status-unknown-bg: 220 20% 15%;
+    --status-unknown-text: 215 20% 65%;
   }
 }
 
@@ -120,5 +109,13 @@
 @layer utilities {
   .safe-bottom {
     padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .scrollbar-none {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
   }
 }

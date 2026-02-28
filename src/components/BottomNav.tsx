@@ -18,18 +18,25 @@ export function BottomNav() {
   if (shouldHide && location.pathname !== '/dynamics' && location.pathname !== '/profile') return null;
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border/15 z-50" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
-      <div className="flex items-center justify-around h-14 max-w-[480px] mx-auto">
+    <nav
+      className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] bg-card border-t border-border/15 z-50"
+      style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+    >
+      <div className="flex items-center justify-around h-14">
         {tabs.map((tab) => {
           const isActive = location.pathname === tab.path;
           return (
-            <button
+            <motion.button
               key={tab.path}
+              whileTap={{ scale: 0.92 }}
+              transition={{ duration: 0.08 }}
               onClick={() => navigate(tab.path)}
               className="relative flex flex-col items-center gap-0.5 px-4 py-1.5 transition-colors duration-200"
             >
               <tab.icon className={`w-5 h-5 transition-colors duration-200 ${isActive ? 'text-primary' : 'text-muted-foreground'}`} />
-              <span className={`text-[10px] font-medium transition-colors duration-200 ${isActive ? 'text-primary' : 'text-muted-foreground'}`}>{tab.label}</span>
+              <span className={`text-[10px] font-medium transition-colors duration-200 ${isActive ? 'text-primary' : 'text-muted-foreground'}`}>
+                {tab.label}
+              </span>
               {isActive && (
                 <motion.span
                   layoutId="bottomNavIndicator"
@@ -37,7 +44,7 @@ export function BottomNav() {
                   transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                 />
               )}
-            </button>
+            </motion.button>
           );
         })}
       </div>

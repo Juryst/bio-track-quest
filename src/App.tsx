@@ -21,28 +21,30 @@ function AnimatedRoutes() {
   const location = useLocation();
 
   return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key={location.pathname}
-        initial={{ opacity: 0, x: 20 }}
-        animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0, x: -20 }}
-        transition={{ duration: 0.2 }}
-      >
-        <Routes location={location}>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/analysis/:id" element={<AnalysisDetail />} />
-          <Route path="/analysis/:id/marker/:canonicalName" element={<Dynamics />} />
-          <Route path="/dynamics" element={<Dynamics />} />
-          <Route path="/upload" element={<Upload />} />
-          <Route path="/upload/manual" element={<UploadManual />} />
-          <Route path="/upload/verify" element={<UploadVerify />} />
-          <Route path="/upload/bot" element={<UploadBot />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </motion.div>
-    </AnimatePresence>
+    <div className="max-w-[480px] mx-auto relative min-h-screen">
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={location.pathname}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -20 }}
+          transition={{ duration: 0.2 }}
+        >
+          <Routes location={location}>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/analysis/:id" element={<AnalysisDetail />} />
+            <Route path="/analysis/:id/marker/:canonicalName" element={<Dynamics />} />
+            <Route path="/dynamics" element={<Dynamics />} />
+            <Route path="/upload" element={<Upload />} />
+            <Route path="/upload/manual" element={<UploadManual />} />
+            <Route path="/upload/verify" element={<UploadVerify />} />
+            <Route path="/upload/bot" element={<UploadBot />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </motion.div>
+      </AnimatePresence>
+    </div>
   );
 }
 

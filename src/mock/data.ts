@@ -24,6 +24,7 @@ const monthsAgo = (n: number) => {
 
 const analysis4: Analysis = {
   id: 'a4',
+  profileId: 'self',
   type: 'ОАК',
   lab: 'Гемотест',
   date: monthsAgo(4),
@@ -39,6 +40,7 @@ analysis4.status = getAnalysisStatus(analysis4.markers);
 
 const analysis3: Analysis = {
   id: 'a3',
+  profileId: 'self',
   type: 'Гормоны щитовидки',
   lab: 'Инвитро',
   date: monthsAgo(3),
@@ -53,6 +55,7 @@ analysis3.status = getAnalysisStatus(analysis3.markers);
 
 const analysis1: Analysis = {
   id: 'a1',
+  profileId: 'self',
   type: 'ОАК',
   lab: 'Инвитро',
   date: monthsAgo(2),
@@ -70,6 +73,7 @@ analysis1.status = getAnalysisStatus(analysis1.markers);
 
 const analysis2: Analysis = {
   id: 'a2',
+  profileId: 'self',
   type: 'Биохимия',
   lab: 'KDL',
   date: monthsAgo(1),

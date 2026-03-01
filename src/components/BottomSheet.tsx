@@ -1,4 +1,5 @@
 import { ReactNode, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface BottomSheetProps {
@@ -17,7 +18,7 @@ export function BottomSheet({ open, onClose, children }: BottomSheetProps) {
     return () => { document.body.style.overflow = ''; };
   }, [open]);
 
-  return (
+  return createPortal(
     <AnimatePresence>
       {open && (
         <>
@@ -26,24 +27,26 @@ export function BottomSheet({ open, onClose, children }: BottomSheetProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-foreground/30 backdrop-blur-sm z-50"
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[9998]"
           />
           <motion.div
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-            className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] bg-card rounded-t-2xl z-50 max-h-[80vh] overflow-y-auto shadow-xl"
+            className="fixed bottom-0 left-1/2 -translate-x-1/2 bg-card dark:bg-card rounded-t-2xl z-[9999] max-h-[85vh] overflow-y-auto shadow-xl"
+            style={{ width: 'min(480px, 100vw)' }}
           >
             <div className="flex justify-center pt-3 pb-1">
-              <div className="w-10 h-1 rounded-full bg-border" />
+              <div className="w-10 h-1 rounded-full bg-border dark:bg-muted-foreground/30" />
             </div>
-            <div className="px-5 pb-8">
+            <div className="px-5 pb-8" style={{ paddingBottom: 'calc(32px + env(safe-area-inset-bottom, 0px))' }}>
               {children}
             </div>
           </motion.div>
         </>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }

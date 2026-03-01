@@ -29,9 +29,9 @@ const defaultTypeConfig = {
 };
 
 const statusBorderColor: Record<string, string> = {
-  abnormal: 'border-l-status-danger',
-  borderline: 'border-l-status-warning',
-  normal: 'border-l-status-normal',
+  abnormal: 'border-l-card-border-danger',
+  borderline: 'border-l-card-border-warning',
+  normal: 'border-l-card-border-normal',
 };
 
 function formatDate(iso: string) {
@@ -54,12 +54,14 @@ export function AnalysisCard({ analysis }: { analysis: Analysis }) {
   const tc = typeConfig[analysis.type] || defaultTypeConfig;
   const borderClass = statusBorderColor[analysis.status] || 'border-l-muted';
 
+  const labText = analysis.lab && analysis.lab !== 'Не указана' ? ` · ${analysis.lab}` : '';
+
   return (
     <motion.button
       whileTap={{ scale: 0.985 }}
-      transition={{ duration: 0.15, ease: 'easeInOut' }}
+      transition={{ duration: 0.1, ease: 'easeInOut' }}
       onClick={() => navigate(`/analysis/${analysis.id}`)}
-      className={`w-full text-left rounded-xl border border-border/60 bg-card shadow-[0_1px_4px_rgba(0,0,0,0.07)] dark:shadow-[0_1px_4px_rgba(0,0,0,0.3)] p-3.5 pl-0 border-l-4 ${borderClass} transition-shadow`}
+      className={`w-full text-left rounded-xl border border-border/60 bg-card shadow-[0_1px_3px_rgba(0,0,0,0.05)] dark:shadow-none dark:border-border p-3.5 pl-0 border-l-[3px] ${borderClass} transition-shadow`}
     >
       <div className="flex items-center gap-3 pl-3">
         <div className={`w-10 h-10 rounded-[10px] ${tc.bg} flex items-center justify-center shrink-0 ${tc.iconColor}`}>
@@ -74,7 +76,7 @@ export function AnalysisCard({ analysis }: { analysis: Analysis }) {
             </div>
           </div>
           <p className="text-sm text-muted-foreground mt-0.5">
-            {formatDate(analysis.date)} · {analysis.lab}
+            {formatDate(analysis.date)}{labText}
           </p>
           <p className="text-xs text-muted-foreground/70 mt-0.5">
             {getMarkerSummary(analysis)}

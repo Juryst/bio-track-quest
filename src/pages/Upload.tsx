@@ -44,15 +44,10 @@ export default function UploadPage() {
             key={opt.title}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
+            whileTap={{ scale: 0.97 }}
             transition={{ delay: i * 0.08 }}
-            onClick={() => {
-              if (opt.path === '/upload/bot') {
-                navigate('/upload/bot');
-              } else {
-                navigate(opt.path);
-              }
-            }}
-            className="w-full text-left flex items-start gap-4 p-4 rounded-xl border border-border bg-card hover:shadow-md transition-shadow active:scale-[0.98] transition-transform"
+            onClick={() => navigate(opt.path)}
+            className="w-full text-left flex items-start gap-4 p-4 rounded-xl border border-border bg-card shadow-[0_1px_3px_rgba(0,0,0,0.05)] dark:shadow-none transition-shadow"
           >
             <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center shrink-0">
               <opt.icon className={`w-5 h-5 ${opt.color}`} />

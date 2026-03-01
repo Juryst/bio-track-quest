@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, ClipboardList, Calendar, AlertTriangle, ChevronDown } from 'lucide-react';
+import { Plus, ClipboardList, Calendar, ChevronDown } from 'lucide-react';
 import { useAnalysisStore } from '@/store/useAnalysisStore';
 import { useProfilesStore } from '@/store/useProfilesStore';
 import { AnalysisCard } from '@/components/AnalysisCard';
@@ -50,8 +50,8 @@ export default function Dashboard() {
   }, [analyses, activeFilter]);
 
   const abnormalCount = useMemo(
-    () => analyses.filter((a) => a.status === 'abnormal' || a.status === 'borderline').length,
-    [analyses]
+    () => filtered.filter((a) => a.status === 'abnormal' || a.status === 'borderline').length,
+    [filtered]
   );
   const lastDate = useMemo(() => {
     if (analyses.length === 0) return '—';
@@ -65,22 +65,24 @@ export default function Dashboard() {
     <div className="min-h-screen bg-background pb-40">
       {/* Header */}
       <div className="px-4 pt-4 pb-2 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <h1 className="text-xl font-bold text-foreground">{headerTitle}</h1>
-        </div>
-        <button
+        <h1 className="text-xl font-bold text-foreground">{headerTitle}</h1>
+        <motion.button
+          whileTap={{ scale: 0.96 }}
+          transition={{ duration: 0.08 }}
           onClick={() => setProfileSwitcherOpen(true)}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary text-sm font-medium text-foreground"
+          className="flex items-center gap-1.5 pl-1 pr-2.5 py-1 rounded-full bg-secondary dark:bg-secondary text-sm font-medium text-foreground"
         >
-          <span className="w-6 h-6 rounded-full bg-primary/15 flex items-center justify-center text-xs font-bold text-primary">
+          <span className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-[11px] font-bold text-primary-foreground">
             {activeProfile?.name[0] || '?'}
           </span>
-          {activeProfile?.name || 'Профиль'}
+          {activeProfile?.name && activeProfile.name.length > 1 && (
+            <span className="text-sm">{activeProfile.name}</span>
+          )}
           <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
-        </button>
+        </motion.button>
       </div>
 
-      {/* Filters with counts */}
+      {/* Filters */}
       <div className="px-4 pb-3 relative">
         <div
           className="overflow-x-auto scrollbar-none"
@@ -109,7 +111,7 @@ export default function Dashboard() {
       {/* Stats strip */}
       {!loading && analyses.length > 0 && (
         <div className="px-4 pb-3">
-          <div className="flex items-center justify-between rounded-[10px] bg-[rgba(0,0,0,0.03)] dark:bg-[rgba(255,255,255,0.04)] px-3.5 py-2 text-[13px]">
+          <div className="flex items-center justify-between rounded-[10px] bg-secondary/50 dark:bg-secondary/30 px-3.5 py-2 text-[13px]">
             <div className="flex items-center gap-1.5">
               <ClipboardList className="w-3.5 h-3.5 text-muted-foreground" />
               <span className="text-muted-foreground">
@@ -121,8 +123,7 @@ export default function Dashboard() {
             </div>
             <div className="w-px h-4 bg-border" />
             <div className="flex items-center gap-1.5">
-              <span className="text-muted-foreground">⚠️</span>
-              <span className="text-muted-foreground">Отклон.:</span>
+              <span className="text-muted-foreground">⚠️ Откл.:</span>
               <span className="font-semibold text-foreground">{abnormalCount}</span>
             </div>
             <div className="w-px h-4 bg-border" />
@@ -175,14 +176,14 @@ export default function Dashboard() {
           </motion.div>
         ) : (
           <AnimatePresence mode="popLayout">
-            {filtered.map((a) => (
+            {filtered.map((a, i) => (
               <motion.div
                 key={a.id}
                 layout
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.15 }}
+                initial={{ opacity: 0, scale: 0.97 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.97 }}
+                transition={{ duration: 0.15, delay: i * 0.03 }}
               >
                 <AnalysisCard analysis={a} />
               </motion.div>

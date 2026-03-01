@@ -1,12 +1,16 @@
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { ArrowLeft, Bot, ExternalLink } from 'lucide-react';
+import { toast } from 'sonner';
+
+const BOT_USERNAME = '@medanalyze_bot';
 
 export default function UploadBot() {
   const navigate = useNavigate();
 
   const steps = [
-    'Откройте бота @your_bot_name',
-    'Отправьте PDF или фото бланка',
+    `Откройте бота ${BOT_USERNAME}`,
+    'Отправьте PDF, JPG или PNG бланка',
     'Бот обработает и анализ появится здесь',
   ];
 
@@ -39,11 +43,17 @@ export default function UploadBot() {
           ))}
         </div>
 
-        <button className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-semibold">
-          <ExternalLink className="w-4 h-4" /> Открыть бота
-        </button>
+        <p className="text-xs text-muted-foreground text-center">Поддерживаются: PDF, JPG, PNG</p>
 
-        <div className="p-3 rounded-xl bg-status-warning-bg border border-status-warning/20">
+        <motion.button
+          whileTap={{ scale: 0.97 }}
+          onClick={() => toast.info('Функция доступна в финальной версии')}
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-border text-sm font-semibold text-foreground"
+        >
+          <ExternalLink className="w-4 h-4" /> Открыть бота
+        </motion.button>
+
+        <div className="p-3 rounded-xl bg-status-warning-bg border border-status-warning-border">
           <p className="text-xs text-foreground">
             ⚠️ Функция в разработке — в демо-режиме не работает
           </p>

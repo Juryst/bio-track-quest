@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -17,11 +18,25 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+function useDarkThemeSync() {
+  useEffect(() => {
+    const sync = () => {
+      const tg = (window as any).Telegram?.WebApp;
+      const isDark = tg?.colorScheme === 'dark';
+      document.documentElement.classList.toggle('dark', isDark);
+    };
+    sync();
+    const tg = (window as any).Telegram?.WebApp;
+    tg?.onEvent?.('themeChanged', sync);
+    return () => tg?.offEvent?.('themeChanged', sync);
+  }, []);
+}
+
 function AnimatedRoutes() {
   const location = useLocation();
 
   return (
-    <div className="max-w-[480px] mx-auto relative min-h-screen">
+    <div className="max-w-[480px] mx-auto relative min-h-screen overflow-hidden">
       <AnimatePresence mode="wait">
         <motion.div
           key={location.pathname}
@@ -48,17 +63,21 @@ function AnimatedRoutes() {
   );
 }
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AnimatedRoutes />
-        <BottomNav />
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  useDarkThemeSync();
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AnimatedRoutes />
+          <BottomNav />
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;

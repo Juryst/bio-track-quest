@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Plus, Trash2, Loader2 } from 'lucide-react';
 import { useAnalysisStore } from '@/store/useAnalysisStore';
+import { useProfilesStore } from '@/store/useProfilesStore';
 import { getMarkerStatus } from '@/utils/getMarkerStatus';
 import { getAnalysisStatus } from '@/utils/getAnalysisStatus';
 import { Analysis, Marker } from '@/types';
+import { UnitSelector } from '@/components/UnitSelector';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 
@@ -27,14 +29,12 @@ const mockOcrResult: OcrRow[] = [
 export default function UploadVerify() {
   const navigate = useNavigate();
   const addAnalysis = useAnalysisStore((s) => s.addAnalysis);
+  const activeProfileId = useProfilesStore((s) => s.activeProfileId);
   const [loading, setLoading] = useState(true);
   const [rows, setRows] = useState<OcrRow[]>([]);
 
   useEffect(() => {
-    const t = setTimeout(() => {
-      setRows(mockOcrResult);
-      setLoading(false);
-    }, 2000);
+    const t = setTimeout(() => { setRows(mockOcrResult); setLoading(false); }, 2000);
     return () => clearTimeout(t);
   }, []);
 
@@ -44,7 +44,7 @@ export default function UploadVerify() {
 
   const handleSave = () => {
     const markers: Marker[] = rows.filter((r) => r.name && r.value).map((r) => {
-      const val = Number(r.value);
+      const val = Number(r.value.replace(',', '.'));
       const range = r.refMin && r.refMax ? { low: Number(r.refMin), high: Number(r.refMax), unit: r.unit } : undefined;
       return {
         id: Math.random().toString(36).slice(2),
@@ -59,6 +59,7 @@ export default function UploadVerify() {
 
     const analysis: Analysis = {
       id: Math.random().toString(36).slice(2),
+      profileId: activeProfileId,
       type: 'ОАК',
       lab: 'Распознано',
       date: new Date().toISOString(),
@@ -74,10 +75,7 @@ export default function UploadVerify() {
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
-        >
+        <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}>
           <Loader2 className="w-10 h-10 text-primary" />
         </motion.div>
         <p className="text-sm text-foreground font-medium">Распознаём данные...</p>
@@ -96,40 +94,33 @@ export default function UploadVerify() {
       </div>
 
       <div className="p-5">
-        <p className="text-xs text-muted-foreground mb-4">
-          Мы распознали следующие данные — проверьте перед сохранением
-        </p>
-
+        <p className="text-xs text-muted-foreground mb-4">Мы распознали следующие данные — проверьте перед сохранением</p>
         <div className="space-y-3">
           {rows.map((row) => (
             <div key={row.key} className="p-3 rounded-xl border border-border bg-card space-y-2">
               <div className="flex items-center gap-2">
-                <input
-                  value={row.name}
-                  onChange={(e) => updateRow(row.key, 'name', e.target.value)}
-                  className="flex-1 px-3 py-2 rounded-lg border border-border bg-background text-sm text-foreground outline-none"
-                />
-                <button
-                  onClick={() => setRows((prev) => prev.filter((r) => r.key !== row.key))}
-                  className="p-2 text-muted-foreground hover:text-status-danger"
-                >
+                <input value={row.name} onChange={(e) => updateRow(row.key, 'name', e.target.value)}
+                  className="flex-1 px-3 py-2 rounded-lg border border-border bg-background text-sm text-foreground outline-none focus:ring-2 focus:ring-ring" />
+                <button onClick={() => setRows((prev) => prev.filter((r) => r.key !== row.key))}
+                  className="p-2 text-muted-foreground hover:text-status-danger">
                   <Trash2 className="w-4 h-4" />
                 </button>
               </div>
               <div className="grid grid-cols-4 gap-2">
                 <input value={row.value} onChange={(e) => updateRow(row.key, 'value', e.target.value)} placeholder="Знач."
+                  inputMode="decimal"
                   className="px-3 py-2 rounded-lg border border-border bg-background text-sm text-foreground outline-none" />
-                <input value={row.unit} onChange={(e) => updateRow(row.key, 'unit', e.target.value)} placeholder="Ед."
-                  className="px-3 py-2 rounded-lg border border-border bg-background text-sm text-foreground outline-none" />
+                <UnitSelector value={row.unit} onChange={(u) => updateRow(row.key, 'unit', u)} />
                 <input value={row.refMin} onChange={(e) => updateRow(row.key, 'refMin', e.target.value)} placeholder="Мин"
+                  inputMode="decimal"
                   className="px-3 py-2 rounded-lg border border-border bg-background text-sm text-foreground outline-none" />
                 <input value={row.refMax} onChange={(e) => updateRow(row.key, 'refMax', e.target.value)} placeholder="Макс"
+                  inputMode="decimal"
                   className="px-3 py-2 rounded-lg border border-border bg-background text-sm text-foreground outline-none" />
               </div>
             </div>
           ))}
         </div>
-
         <button
           onClick={() => setRows((prev) => [...prev, { key: Math.random().toString(36).slice(2), name: '', value: '', unit: '', refMin: '', refMax: '' }])}
           className="mt-3 flex items-center gap-1.5 text-sm font-medium text-primary"
@@ -138,13 +129,12 @@ export default function UploadVerify() {
         </button>
       </div>
 
-      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] p-4 bg-card border-t border-border safe-bottom">
-        <button
-          onClick={handleSave}
-          className="w-full py-3 rounded-xl bg-primary text-primary-foreground text-sm font-semibold active:scale-[0.98] transition-transform"
-        >
+      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] p-4 bg-card border-t border-border"
+        style={{ paddingBottom: 'calc(16px + env(safe-area-inset-bottom, 0px))' }}>
+        <motion.button whileTap={{ scale: 0.97 }} onClick={handleSave}
+          className="w-full py-3 rounded-xl bg-primary text-primary-foreground text-sm font-semibold">
           Сохранить анализ
-        </button>
+        </motion.button>
       </div>
     </div>
   );

@@ -19,6 +19,13 @@ const relationLabels: Record<string, string> = {
 export function ProfileSwitcher({ open, onClose }: ProfileSwitcherProps) {
   const { profiles, activeProfileId, switchProfile, addProfile } = useProfilesStore();
 
+  const handleSwitch = (id: string) => {
+    const profile = profiles.find(p => p.id === id);
+    switchProfile(id);
+    onClose();
+    if (profile) toast.success(`Профиль: ${profile.name}`, { duration: 2000 });
+  };
+
   const handleAdd = () => {
     const name = prompt('Имя нового профиля:');
     if (!name?.trim()) return;
@@ -35,16 +42,13 @@ export function ProfileSwitcher({ open, onClose }: ProfileSwitcherProps) {
 
   return (
     <BottomSheet open={open} onClose={onClose}>
-      <h3 className="text-lg font-bold text-foreground mb-4">Выберите профиль</h3>
-      <div className="space-y-1">
+      <h3 className="text-base font-semibold text-foreground mb-3">Выберите профиль</h3>
+      <div className="border-t border-border/50 pt-2 space-y-0.5">
         {profiles.map((p) => (
           <button
             key={p.id}
-            onClick={() => {
-              switchProfile(p.id);
-              onClose();
-            }}
-            className="w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-colors hover:bg-accent active:bg-accent"
+            onClick={() => handleSwitch(p.id)}
+            className="w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-colors active:bg-accent"
           >
             <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-sm font-bold text-primary shrink-0">
               {p.name[0]}
@@ -63,7 +67,7 @@ export function ProfileSwitcher({ open, onClose }: ProfileSwitcherProps) {
       </div>
       <button
         onClick={handleAdd}
-        className="w-full flex items-center gap-3 px-3 py-3 mt-2 rounded-xl text-primary hover:bg-accent transition-colors"
+        className="w-full flex items-center gap-3 px-3 py-3 mt-1 rounded-xl text-primary active:bg-accent transition-colors"
       >
         <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
           <Plus className="w-4 h-4" />

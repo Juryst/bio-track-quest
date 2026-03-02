@@ -34,27 +34,27 @@
     --radius: 0.75rem;
 
     /* Medical status colors - soft & professional */
-    --status-normal: 142 60% 25%;
-    --status-normal-bg: 138 63% 97%;
-    --status-normal-text: 142 60% 25%;
-    --status-normal-border: 133 40% 83%;
-    --status-warning: 33 82% 29%;
-    --status-warning-bg: 48 100% 96%;
-    --status-warning-text: 33 82% 29%;
-    --status-warning-border: 48 96% 77%;
-    --status-danger: 0 69% 36%;
-    --status-danger-bg: 0 100% 97%;
-    --status-danger-text: 0 69% 36%;
-    --status-danger-border: 0 89% 91%;
-    --status-unknown: 220 9% 60%;
-    --status-unknown-bg: 220 14% 98%;
-    --status-unknown-text: 215 16% 47%;
-    --status-unknown-border: 220 13% 91%;
+    --status-normal: #1A6634;
+    --status-normal-bg: #F2FCF5;
+    --status-normal-text: #1A6634;
+    --status-normal-border: #C3E6CB;
+    --status-warning: #854D0E;
+    --status-warning-bg: #FFFBEB;
+    --status-warning-text: #854D0E;
+    --status-warning-border: #FDE68A;
+    --status-danger: #9B1C1C;
+    --status-danger-bg: #FFF1F1;
+    --status-danger-text: #9B1C1C;
+    --status-danger-border: #FCD5D5;
+    --status-unknown: #94A3B8;
+    --status-unknown-bg: #F8FAFC;
+    --status-unknown-text: #64748B;
+    --status-unknown-border: #E2E8F0;
 
     /* Soft card border colors */
-    --card-border-danger: 0 89% 91%;
-    --card-border-warning: 48 96% 77%;
-    --card-border-normal: 133 40% 83%;
+    --card-border-danger: #FCD5D5;
+    --card-border-warning: #FDE68A;
+    --card-border-normal: #C3E6CB;
 
     --chart-reference: 142 71% 35%;
 

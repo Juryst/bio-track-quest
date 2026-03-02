@@ -6,8 +6,8 @@ import { motion } from 'framer-motion';
 
 const typeConfig: Record<string, { bg: string; iconColor: string; icon: React.ReactNode }> = {
   'ОАК': {
-    bg: 'bg-[rgba(220,38,38,0.08)]',
-    iconColor: 'text-status-danger',
+    bg: 'bg-status-danger-bg',
+    iconColor: 'text-status-danger-text',
     icon: <Droplets className="w-5 h-5" />,
   },
   'Биохимия': {
@@ -16,8 +16,8 @@ const typeConfig: Record<string, { bg: string; iconColor: string; icon: React.Re
     icon: <FlaskConical className="w-5 h-5" />,
   },
   'Гормоны щитовидки': {
-    bg: 'bg-[rgba(22,163,74,0.08)]',
-    iconColor: 'text-status-normal',
+    bg: 'bg-status-normal-bg',
+    iconColor: 'text-status-normal-text',
     icon: <Heart className="w-5 h-5" />,
   },
 };
@@ -49,10 +49,17 @@ function getMarkerSummary(analysis: Analysis): string {
   return parts.length > 0 ? parts.join(' · ') : 'Все показатели в норме';
 }
 
+const statusSurfaceTint: Record<string, string> = {
+  abnormal: 'bg-status-danger-bg',
+  borderline: 'bg-status-warning-bg',
+  normal: 'bg-status-normal-bg',
+};
+
 export function AnalysisCard({ analysis }: { analysis: Analysis }) {
   const navigate = useNavigate();
   const tc = typeConfig[analysis.type] || defaultTypeConfig;
   const borderClass = statusBorderColor[analysis.status] || 'border-l-muted';
+  const surfaceTint = statusSurfaceTint[analysis.status] || '';
 
   const labText = analysis.lab && analysis.lab !== 'Не указана' ? ` · ${analysis.lab}` : '';
 
@@ -61,7 +68,7 @@ export function AnalysisCard({ analysis }: { analysis: Analysis }) {
       whileTap={{ scale: 0.985 }}
       transition={{ duration: 0.1, ease: 'easeInOut' }}
       onClick={() => navigate(`/analysis/${analysis.id}`)}
-      className={`w-full text-left rounded-xl border border-border/60 bg-card shadow-[0_1px_3px_rgba(0,0,0,0.05)] dark:shadow-none dark:border-border p-3.5 pl-0 border-l-[3px] ${borderClass} transition-shadow`}
+      className={`w-full text-left rounded-xl border border-border/60 ${surfaceTint || 'bg-card'} shadow-[0_1px_3px_rgba(0,0,0,0.05)] dark:shadow-none dark:border-border p-3.5 pl-0 border-l-[3px] ${borderClass} transition-shadow`}
     >
       <div className="flex items-center gap-3 pl-3">
         <div className={`w-10 h-10 rounded-[10px] ${tc.bg} flex items-center justify-center shrink-0 ${tc.iconColor}`}>

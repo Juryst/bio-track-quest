@@ -22,7 +22,7 @@ export function MarkerRow({ marker, onTap, editMode, onDelete }: MarkerRowProps)
     <motion.button
       whileTap={{ scale: editMode ? 1 : 0.99 }}
       transition={{ duration: 0.08 }}
-      onClick={editMode ? undefined : onTap}
+      onClick={onTap}
       className={`w-full text-left flex items-center gap-2 px-4 py-3 min-h-[52px] border-b border-border/30 last:border-b-0 transition-colors active:bg-accent/50 ${bgClass}`}
     >
       {editMode && (

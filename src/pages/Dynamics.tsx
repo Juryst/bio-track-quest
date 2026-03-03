@@ -9,6 +9,7 @@ import {
 import { useAnalysisStore } from '@/store/useAnalysisStore';
 import { useProfilesStore } from '@/store/useProfilesStore';
 import { StatusBadge } from '@/components/StatusBadge';
+import { BottomSheet } from '@/components/BottomSheet';
 import { MarkerStatus } from '@/types';
 
 function formatDateShort(iso: string) {
@@ -53,8 +54,8 @@ function CustomTooltip({ active, payload }: any) {
 export default function Dynamics() {
   const { canonicalName: paramCanonical } = useParams<{ canonicalName: string }>();
   const activeProfileId = useProfilesStore((s) => s.activeProfileId);
-  const getAnalysesForProfile = useAnalysisStore((s) => s.getAnalysesForProfile);
-  const analyses = useMemo(() => getAnalysesForProfile(activeProfileId), [getAnalysesForProfile, activeProfileId]);
+  const allAnalyses = useAnalysisStore((s) => s.analyses);
+  const analyses = useMemo(() => allAnalyses.filter((a) => (a.profileId || 'self') === activeProfileId), [allAnalyses, activeProfileId]);
   const [search, setSearch] = useState('');
   const [selectorOpen, setSelectorOpen] = useState(false);
 
@@ -74,7 +75,6 @@ export default function Dynamics() {
     return Array.from(seen.entries()).map(([cn, d]) => ({ canonicalName: cn, ...d }));
   }, [analyses]);
 
-  // Auto-select best marker
   const defaultMarker = useMemo(() => {
     if (paramCanonical) return paramCanonical;
     const multiPoint = allMarkers.filter(m => m.count >= 2);
@@ -154,45 +154,49 @@ export default function Dynamics() {
         <h1 className="text-xl font-bold text-foreground">Динамика</h1>
       </div>
 
+      {/* Marker selector trigger */}
       <div className="px-5 mb-4">
         <button
-          onClick={() => setSelectorOpen(!selectorOpen)}
+          onClick={() => setSelectorOpen(true)}
           className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-border bg-card"
         >
           <span className="text-sm font-medium text-foreground">{selectedInfo?.name || 'Выберите показатель'}</span>
           <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${selectorOpen ? 'rotate-180' : ''}`} />
         </button>
-
-        {selectorOpen && (
-          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
-            className="mt-2 rounded-xl border border-border bg-card shadow-lg overflow-hidden max-h-64 overflow-y-auto">
-            <div className="p-3 border-b border-border">
-              <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary">
-                <Search className="w-4 h-4 text-muted-foreground" />
-                <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Поиск..."
-                  className="bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none flex-1" />
-              </div>
-            </div>
-            {Object.entries(grouped).map(([category, markers]) => (
-              <div key={category}>
-                <p className="px-4 py-1.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider bg-secondary/50">{category}</p>
-                {markers.map((m) => (
-                  <button
-                    key={m.canonicalName}
-                    onClick={() => { setSelectedCanonical(m.canonicalName); setSelectorOpen(false); setSearch(''); }}
-                    className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
-                      m.canonicalName === selectedCanonical ? 'bg-primary/10 text-primary font-medium' : 'text-foreground active:bg-accent'
-                    }`}
-                  >
-                    {m.name}
-                    {m.count >= 2 && <span className="ml-2 text-xs text-muted-foreground">({m.count})</span>}
-                  </button>
-                ))}
-              </div>
-            ))}
-          </motion.div>
-        )}
       </div>
+
+      {/* Marker selector BottomSheet */}
+      <BottomSheet open={selectorOpen} onClose={() => { setSelectorOpen(false); setSearch(''); }}>
+        <h3 className="text-base font-semibold text-foreground mb-3">Выберите показатель</h3>
+        <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary mb-3">
+          <Search className="w-4 h-4 text-muted-foreground" />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Поиск..."
+            className="bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none flex-1"
+          />
+        </div>
+        <div className="max-h-[50vh] overflow-y-auto -mx-2">
+          {Object.entries(grouped).map(([category, markers]) => (
+            <div key={category}>
+              <p className="px-4 py-1.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider bg-secondary/50">{category}</p>
+              {markers.map((m) => (
+                <button
+                  key={m.canonicalName}
+                  onClick={() => { setSelectedCanonical(m.canonicalName); setSelectorOpen(false); setSearch(''); }}
+                  className={`w-full text-left px-4 py-2.5 text-sm transition-colors active:bg-accent ${
+                    m.canonicalName === selectedCanonical ? 'bg-primary/10 text-primary font-medium' : 'text-foreground'
+                  }`}
+                >
+                  {m.name}
+                  {m.count >= 2 && <span className="ml-2 text-xs text-muted-foreground">({m.count})</span>}
+                </button>
+              ))}
+            </div>
+          ))}
+        </div>
+      </BottomSheet>
 
       {trendSummary && (
         <div className="mx-5 mb-3 flex items-center gap-2 px-3.5 py-2.5 rounded-[10px] bg-secondary dark:bg-secondary/50">

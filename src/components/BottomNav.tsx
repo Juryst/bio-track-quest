@@ -8,14 +8,14 @@ const tabs = [
   { icon: User, label: 'Профиль', path: '/profile' },
 ];
 
-const hiddenPaths = ['/upload', '/analysis/'];
+const HIDE_NAV_ROUTES = ['/upload'];
 
 export function BottomNav() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const shouldHide = hiddenPaths.some(p => location.pathname.startsWith(p) && location.pathname !== '/');
-  if (shouldHide && location.pathname !== '/dynamics' && location.pathname !== '/profile') return null;
+  const shouldHide = HIDE_NAV_ROUTES.some(r => location.pathname.startsWith(r));
+  if (shouldHide) return null;
 
   return (
     <nav

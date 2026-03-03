@@ -17,8 +17,8 @@ function formatShortDate(iso: string) {
 export default function Dashboard() {
   const navigate = useNavigate();
   const { activeProfileId, profiles } = useProfilesStore();
-  const getAnalysesForProfile = useAnalysisStore((s) => s.getAnalysesForProfile);
-  const analyses = useMemo(() => getAnalysesForProfile(activeProfileId), [getAnalysesForProfile, activeProfileId]);
+  const allAnalyses = useAnalysisStore((s) => s.analyses);
+  const analyses = useMemo(() => allAnalyses.filter((a) => (a.profileId || 'self') === activeProfileId), [allAnalyses, activeProfileId]);
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState<string>('Все');
   const [profileSwitcherOpen, setProfileSwitcherOpen] = useState(false);

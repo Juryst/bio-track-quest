@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { BottomNav } from "@/components/BottomNav";
+import { useBackButton } from "@/hooks/useBackButton";
 import Dashboard from "./pages/Dashboard";
 import AnalysisDetail from "./pages/AnalysisDetail";
 import Dynamics from "./pages/Dynamics";
@@ -34,6 +35,7 @@ function useDarkThemeSync() {
 
 function AnimatedRoutes() {
   const location = useLocation();
+  useBackButton();
 
   return (
     <div className="max-w-[480px] mx-auto relative min-h-screen overflow-hidden">

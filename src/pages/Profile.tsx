@@ -29,6 +29,7 @@ export default function ProfilePage() {
     const next = !isDark;
     setIsDark(next);
     document.documentElement.classList.toggle('dark', next);
+    localStorage.setItem('theme', next ? 'dark' : 'light');
   };
 
   const toggleCondition = (c: string) => {

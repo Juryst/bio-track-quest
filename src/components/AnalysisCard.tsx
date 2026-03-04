@@ -6,8 +6,8 @@ import { motion } from 'framer-motion';
 
 const typeConfig: Record<string, { bg: string; iconColor: string; icon: React.ReactNode }> = {
   'ОАК': {
-    bg: 'bg-status-danger-bg',
-    iconColor: 'text-status-danger-text',
+    bg: 'bg-accent',
+    iconColor: 'text-muted-foreground',
     icon: <Droplets className="w-5 h-5" />,
   },
   'Биохимия': {

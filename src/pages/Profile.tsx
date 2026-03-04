@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { User, Info, X, Plus, Check } from 'lucide-react';
+import { User, Info, X, Plus, Check, Moon, Sun } from 'lucide-react';
 import { useProfilesStore } from '@/store/useProfilesStore';
 import { useTelegramSdk } from '@/hooks/useTelegramSdk';
 import { Sex } from '@/types';

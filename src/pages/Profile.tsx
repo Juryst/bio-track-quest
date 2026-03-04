@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { User, Info, X, Plus, Check } from 'lucide-react';
+import { User, Info, X, Plus, Check, Moon, Sun } from 'lucide-react';
 import { useProfilesStore } from '@/store/useProfilesStore';
 import { useTelegramSdk } from '@/hooks/useTelegramSdk';
 import { Sex } from '@/types';
@@ -15,6 +15,8 @@ export default function ProfilePage() {
   const { profiles, activeProfileId, updateProfile } = useProfilesStore();
   const activeProfile = profiles.find((p) => p.id === activeProfileId);
 
+  const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'));
+
   const [dob, setDob] = useState(activeProfile?.dob || '');
   const [sex, setSex] = useState<Sex | undefined>(activeProfile?.sex);
   const [conditions, setConditions] = useState<string[]>(activeProfile?.conditions || []);
@@ -22,6 +24,12 @@ export default function ProfilePage() {
   const [supplements, setSupplements] = useState<string[]>(activeProfile?.supplements || []);
   const [medInput, setMedInput] = useState('');
   const [suppInput, setSuppInput] = useState('');
+
+  const toggleTheme = () => {
+    const next = !isDark;
+    setIsDark(next);
+    document.documentElement.classList.toggle('dark', next);
+  };
 
   const toggleCondition = (c: string) => {
     setConditions((prev) => (prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c]));
@@ -177,6 +185,20 @@ export default function ProfilePage() {
               <Plus className="w-4 h-4 text-foreground" />
             </button>
           </div>
+        </div>
+
+        {/* Theme toggle */}
+        <div className="flex items-center justify-between p-3 rounded-xl bg-secondary">
+          <div className="flex items-center gap-2.5">
+            {isDark ? <Moon className="w-4 h-4 text-primary" /> : <Sun className="w-4 h-4 text-primary" />}
+            <span className="text-sm font-medium text-foreground">Тёмная тема</span>
+          </div>
+          <button
+            onClick={toggleTheme}
+            className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${isDark ? 'bg-primary' : 'bg-muted-foreground/30'}`}
+          >
+            <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-card shadow transition-transform duration-200 ${isDark ? 'translate-x-5' : ''}`} />
+          </button>
         </div>
 
         {/* Info callout */}

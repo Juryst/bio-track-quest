@@ -21,15 +21,41 @@ const queryClient = new QueryClient();
 
 function useDarkThemeSync() {
   useEffect(() => {
-    const sync = () => {
+    const apply = (dark: boolean) => document.documentElement.classList.toggle('dark', dark);
+
+    // Priority: localStorage > Telegram SDK > system preference
+    const stored = localStorage.getItem('theme');
+    if (stored) {
+      apply(stored === 'dark');
+    } else {
       const tg = (window as any).Telegram?.WebApp;
-      const isDark = tg?.colorScheme === 'dark';
-      document.documentElement.classList.toggle('dark', isDark);
-    };
-    sync();
+      if (tg?.colorScheme) {
+        apply(tg.colorScheme === 'dark');
+      } else {
+        apply(window.matchMedia('(prefers-color-scheme: dark)').matches);
+      }
+    }
+
+    // Listen to Telegram theme changes
     const tg = (window as any).Telegram?.WebApp;
-    tg?.onEvent?.('themeChanged', sync);
-    return () => tg?.offEvent?.('themeChanged', sync);
+    const onTgTheme = () => {
+      if (!localStorage.getItem('theme')) apply(tg?.colorScheme === 'dark');
+    };
+    tg?.onEvent?.('themeChanged', onTgTheme);
+
+    // Listen to system preference changes
+    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    const onSystem = (e: MediaQueryListEvent) => {
+      if (!localStorage.getItem('theme') && !(window as any).Telegram?.WebApp?.colorScheme) {
+        apply(e.matches);
+      }
+    };
+    mq.addEventListener('change', onSystem);
+
+    return () => {
+      tg?.offEvent?.('themeChanged', onTgTheme);
+      mq.removeEventListener('change', onSystem);
+    };
   }, []);
 }
 

@@ -187,6 +187,20 @@ export default function ProfilePage() {
           </div>
         </div>
 
+        {/* Theme toggle */}
+        <div className="flex items-center justify-between p-3 rounded-xl bg-secondary">
+          <div className="flex items-center gap-2.5">
+            {isDark ? <Moon className="w-4 h-4 text-primary" /> : <Sun className="w-4 h-4 text-primary" />}
+            <span className="text-sm font-medium text-foreground">Тёмная тема</span>
+          </div>
+          <button
+            onClick={toggleTheme}
+            className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${isDark ? 'bg-primary' : 'bg-muted-foreground/30'}`}
+          >
+            <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-card shadow transition-transform duration-200 ${isDark ? 'translate-x-5' : ''}`} />
+          </button>
+        </div>
+
         {/* Info callout */}
         <div className="flex gap-2 p-3 rounded-xl bg-secondary">
           <Info className="w-4 h-4 text-primary shrink-0 mt-0.5" />

@@ -25,6 +25,12 @@ export default function ProfilePage() {
   const [medInput, setMedInput] = useState('');
   const [suppInput, setSuppInput] = useState('');
 
+  const toggleTheme = () => {
+    const next = !isDark;
+    setIsDark(next);
+    document.documentElement.classList.toggle('dark', next);
+  };
+
   const toggleCondition = (c: string) => {
     setConditions((prev) => (prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c]));
   };

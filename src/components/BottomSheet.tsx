@@ -34,8 +34,8 @@ export function BottomSheet({ open, onClose, children }: BottomSheetProps) {
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-            className="fixed bottom-0 left-1/2 -translate-x-1/2 bg-card dark:bg-card rounded-t-2xl z-[9999] max-h-[85vh] overflow-y-auto shadow-xl"
-            style={{ width: 'min(480px, 100vw)' }}
+            className="fixed bottom-0 left-0 right-0 mx-auto bg-card rounded-t-2xl z-[9999] max-h-[85vh] overflow-y-auto shadow-xl"
+            style={{ width: 'min(480px, 100%)' }}
           >
             <div className="flex justify-center pt-3 pb-1">
               <div className="w-10 h-1 rounded-full bg-border dark:bg-muted-foreground/30" />

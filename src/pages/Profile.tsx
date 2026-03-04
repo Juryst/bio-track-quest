@@ -15,6 +15,10 @@ export default function ProfilePage() {
   const { profiles, activeProfileId, updateProfile } = useProfilesStore();
   const activeProfile = profiles.find((p) => p.id === activeProfileId);
 
+  const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'));
+  const { profiles, activeProfileId, updateProfile } = useProfilesStore();
+  const activeProfile = profiles.find((p) => p.id === activeProfileId);
+
   const [dob, setDob] = useState(activeProfile?.dob || '');
   const [sex, setSex] = useState<Sex | undefined>(activeProfile?.sex);
   const [conditions, setConditions] = useState<string[]>(activeProfile?.conditions || []);
